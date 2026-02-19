@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>瓢蟲·集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #FFFFFF;
+            --color-text: #1A1A1A;
+            --color-accent: #C72027;
+            --color-line: #D0D0D0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 
+                         "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ==================== Loading Screen ==================== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #F5F5F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-ladybug {
+            width: 73px;
+            height: 73px;
+            animation: shakeLadybug 0.6s ease-in-out;
+        }
+
+        .loading-ladybug img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @keyframes shakeLadybug {
+            0% {
+                transform: translateX(0) rotate(0deg);
+            }
+            10% {
+                transform: translateX(-8px) rotate(-8deg);
+            }
+            20% {
+                transform: translateX(8px) rotate(8deg);
+            }
+            30% {
+                transform: translateX(-8px) rotate(-8deg);
+            }
+            40% {
+                transform: translateX(8px) rotate(8deg);
+            }
+            50% {
+                transform: translateX(-5px) rotate(-5deg);
+            }
+            60% {
+                transform: translateX(5px) rotate(5deg);
+            }
+            70% {
+                transform: translateX(-2px) rotate(-2deg);
+            }
+            80% {
+                transform: translateX(2px) rotate(2deg);
+            }
+            90%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+        }
+
+        /* ==================== Main Layout ==================== */
+        .page-wrapper {
+            display: grid;
+            grid-template-columns: 1fr minmax(auto, 500px) 1fr;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Background Ladybugs */
+        .side-panel { 
+            background-image: url(background.jpg) ;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .ladybug-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding: 2rem;
+            align-content: start;
+        }
+
+        .ladybug-icon {
+            width: 100%;
+            max-width: 120px;
+            height: auto;
+            opacity: 0.8;
+        }
+
+        /* Center Content */
+        .main-content {
+            background: var(--color-bg);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== Header ==================== */
+        .header {
+            background: var(--color-accent);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-logo {
+            height: 50px;
+        }
+
+        .header-logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-menu {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            gap: 6px;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .hamburger-line {
+            width: 30px;
+            height: 3px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        /* ==================== Content Area ==================== */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+        }
+
+        /* Logo Section */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease 0.5s backwards;
+        }
+
+        /* Typing Text */
+        .typing-text {
+            font-size: 1.25rem;
+            letter-spacing: 0.1em;
+            color: var(--color-text);
+            min-height: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 2rem;
+            border: 1px solid var(--color-line);
+            border-radius: 50px;
+            position: relative;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .typing-text::after {
+            content: '|';
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Circle Buttons */
+        .circle-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+            
+            animation: fadeIn 1s ease 1.5s backwards;
+        }
+
+        .circle-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: var(--color-text);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .circle-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-accent);
+            transform: scale(0);
+            transition: transform 0.4s ease;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .circle-button:hover::before {
+            transform: scale(1);
+        }
+
+        .circle-button:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(199, 32, 39, 0.4);
+        }
+
+        .circle-text-zh {
+            font-size: 1.5rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .circle-text-en {
+            font-size: 1rem;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.05em;
+        }
+
+        /* ==================== Footer ==================== */
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            border-top: 1px solid var(--color-line);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            font-size: 0.875rem;
+            opacity: 0.6;
+        }
+
+        /* ==================== Side Menu ==================== */
+        .side-menu {
+            position: fixed;
+            top: -100%;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background: black;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: top 0.4s ease;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side-menu.active {
+            top: 0;
+        }
+
+        .menu-header {
+            background: black;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .menu-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #D4AF7A;
+            display: none;
+        }
+
+        .menu-close {
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #D4AF7A;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .menu-content {
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            width: 100%;
+        }
+
+        .menu-item {
+            text-decoration: none;
+            color: #D4AF7A;
+            font-size: 1.125rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .menu-item-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: #D4AF7A;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover .menu-item-icon {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(212, 175, 122, 0.3);
+        }
+
+        .menu-item-text-zh {
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+        }
+
+        .menu-item-text-en {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-item::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 3rem;
+            background: rgba(212, 175, 122, 0.3);
+        }
+
+        .menu-item:last-child::after {
+            display: none;
+        }
+
+        /* Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ==================== Animations ==================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 768px) {
+            .page-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .side-panel {
+                display: none;
+            }
+
+            .main-content {
+                box-shadow: none;
+            }
+
+            .header {
+                padding: 0.75rem 1rem;
+            }
+
+            .header-logo {
+                height: 45px;
+            }
+
+            .hamburger-menu {
+                right: 1rem;
+            }
+
+            .content-area {
+                padding: 3rem 1.5rem;
+            }
+
+            .typing-text {
+                font-size: 1rem;
+                padding: 1.25rem 1.5rem;
+                border-radius: 40px;
+            }
+
+            .circle-buttons {
+                gap: 2rem;
+            }
+
+            .circle-button {
+                width: 180px;
+                height: 180px;
+            }
+
+            .circle-text-zh {
+                font-size: 1.25rem;
+            }
+
+            .circle-text-en {
+                font-size: 0.875rem;
+            }
+
+            .side-menu {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .circle-button {
+                width: 160px;
+                height: 160px;
+            }
+
+            .circle-text-zh {
+                font-size: 1.125rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-ladybug">
+            <img src="ladybug-icon1.png" alt="瓢蟲">
+        </div>
+    </div>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <h2 class="menu-title"></h2>
+            <button class="menu-close" id="menuClose">×</button>
+        </div>
+        <div class="menu-content">
+            <nav class="menu-nav">
+                <a href="index.html" class="menu-item">
+                    <div class="menu-item-icon">📋</div>
+                    <div class="menu-item-text-zh">瓢蟲首頁</div>
+                    <div class="menu-item-text-en">Home</div>
+                </a>
+                <a href="about.html" class="menu-item">
+                    <div class="menu-item-icon">👥</div>
+                    <div class="menu-item-text-zh">關於我們</div>
+                    <div class="menu-item-text-en">About</div>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Left Side Panel -->
+        <div class="side-panel">
+            
+            <div class="ladybug-pattern">
+                <img src="bgleft.jpg" alt="瓢蟲" width="500px"> 
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-logo">
+                    <img src="logo.png" alt="瓢蟲·集">
+                </div>
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Typing Text -->
+                <div class="logo-section">
+                    <div class="typing-text" id="typingText"></div>
+                </div>
+
+                <!-- Circle Buttons -->
+                <div class="circle-buttons">
+                    <a href="identify.html" class="circle-button">
+                        <span class="circle-text-zh">辨識瓢蟲</span>
+                        <span class="circle-text-en">Identify ladybugs</span>
+                    </a>
+                    <a href="search.html" class="circle-button">
+                        <span class="circle-text-zh">保護瓢蟲</span>
+                        <span class="circle-text-en">Protect ladybugs</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="social-icons">
+                    <a href="#" class="social-icon" aria-label="Instagram"><img src="social-icon.png" alt="" width="40px" height="40px"> </a>
+                    <a href="#" class="social-icon" aria-label="Threads"><img src="social-icon1.png" alt="" width="40px" height="40px"></a>
+                </div>
+                <div class="copyright">© 瓢蟲·集 All Rights Reserved.</div>
+            </footer>
+        </div>
+
+        <!-- Right Side Panel -->
+        <div class="side-panel">
+            <div class="ladybug-pattern">
+                <img src="bgright.jpg" alt="瓢蟲" width="500px">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== Typing Effect ====================
+        const typingText = document.getElementById('typingText');
+        const text = '與我們一同守護小小瓢蟲！';
+        let index = 0;
+
+        function type() {
+            if (index < text.length) {
+                typingText.textContent = text.substring(0, index + 1);
+                index++;
+                setTimeout(type, 150);
+            } else {
+                // Remove blinking cursor after typing is done
+                setTimeout(() => {
+                    typingText.style.setProperty('--cursor-display', 'none');
+                }, 1000);
+            }
+        }
+
+        // ==================== Loading Animation ====================
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                // Start typing effect after loading
+                setTimeout(type, 300);
+            }, 1500); // 1.5 秒後隱藏載入畫面
+        });
+
+        // ==================== Hamburger Menu ====================
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const sideMenu = document.getElementById('sideMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuClose = document.getElementById('menuClose');
+
+        function openMenu() {
+            hamburgerMenu.classList.add('active');
+            sideMenu.classList.add('active');
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            hamburgerMenu.classList.remove('active');
+            sideMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        hamburgerMenu.addEventListener('click', openMenu);
+        menuClose.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMenu();
+            }
+        });
+    </script>
+</body>
+</html>
